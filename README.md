@@ -3,6 +3,7 @@
 ## Descrição
 
 Este é um projeto de plataforma de resenhas que permite aos usuários criar e compartilhar suas resenhas sobre diversos tópicos. Ele possui a opção de comentários e respostas, onde usuários podem discutir e debater sobre as resenhas, criando uma comunidade ativa e engajada.
+
 ## Funcionalidades Principais
 
 - Registro e autenticação de usuários
@@ -41,16 +42,11 @@ Este é um projeto de plataforma de resenhas que permite aos usuários criar e c
 4. Execute as inicializações do Prisma:
    ```
    npx prisma migrate dev
-   ```
-    ```
    npx prisma db push
-   ```
-    ```
-   npx prisma prisma generate
+   npx prisma generate
    ```
 
 5. Para visualizar o banco, digite:
-
    ```
    npx prisma studio
    ```
@@ -61,13 +57,14 @@ Este é um projeto de plataforma de resenhas que permite aos usuários criar e c
    ```
    npm run start
    ```
+
 2. Faça a construção CSS do Tailwind:
    ```
    npm run build:css
-   
    ```
 
 3. O servidor estará rodando em `http://localhost:3000`
+
 ## Estrutura do Banco de Dados
 
 O projeto utiliza três modelos principais:
