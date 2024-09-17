@@ -14,13 +14,18 @@
             <!-- Logo aumentada -->
             <img src="./img/logo.png" alt="Logo Resenhahub" class="h-20"> <!-- Aumentei a altura para 20 -->
             <!-- Navegação (se precisar adicionar links) -->
-            <nav>
+            <nav class="flex items-center space-x-4">
                 <ul class="flex space-x-4">
                     <li><a href="#" class="text-lg font-semibold hover:text-orange-500">Início</a></li>
                     <li><a href="#" class="text-lg font-semibold hover:text-orange-500">Resenhas</a></li>
                     <li><a href="#" class="text-lg font-semibold hover:text-orange-500">Sobre</a></li>
                     <li><a href="#" class="text-lg font-semibold hover:text-orange-500">Contato</a></li>
                 </ul>
+                <!-- Botões de Login e Cadastro -->
+                <div class="space-x-4">
+                    <a href="/login" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Login</a>
+                    <a href="/cadastro" class="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600">Cadastro</a>
+                </div>
             </nav>
         </div>
     </header>
@@ -68,6 +73,13 @@
                     <p class="text-sm text-gray-500">Por Ana Rodrigues | 28 de agosto, 2024</p>
                 </div>
             </article>
+        </div>
+
+        <!-- Nova seção para o botão de criar resenha -->
+        <div class="mt-8 text-center">
+            <button class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-300">
+                <a href="/criar-resenha">Criar Resenha</a>
+            </button>
         </div>
     </main>
 </body>
