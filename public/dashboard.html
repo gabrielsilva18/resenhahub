@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard do Usuário - ResenhaHub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans leading-normal tracking-normal">
+
+    <!-- Sidebar -->
+    <div class="flex flex-col md:flex-row">
+        <nav class="bg-gray-800 w-full md:w-64 h-screen shadow-lg">
+            <div class="p-6">
+                <a href="#" class="text-white text-2xl font-bold">ResenhaHub</a>
+            </div>
+            <ul class="mt-6">
+                <li class="text-gray-300 hover:bg-gray-700 hover:text-white">
+                    <a href="/resenhas" class="flex items-center p-4">
+                        <span class="text-lg">📚 Minhas Resenhas</span>
+                    </a>
+                </li>
+                <li class="text-gray-300 hover:bg-gray-700 hover:text-white">
+                    <a href="/criar-resenha" class="flex items-center p-4">
+                        <span class="text-lg">✍️ Adicionar Nova Resenha</span>
+                    </a>
+                </li>
+                <li class="text-gray-300 hover:bg-gray-700 hover:text-white">
+                    <a href="#" class="flex items-center p-4">
+                        <span class="text-lg">📖 Livros Salvos</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-6 bg-gray-100">
+            <h1 class="text-3xl font-bold mb-6">Dashboard do Usuário</h1>
+
+            <!-- Cards de estatísticas -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Card 1 -->
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h2 class="text-xl font-bold">Total de Resenhas</h2>
+                    <p class="text-gray-600 text-4xl mt-4">8</p>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h2 class="text-xl font-bold">Livros Salvos</h2>
+                    <p class="text-gray-600 text-4xl mt-4">12</p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h2 class="text-xl font-bold">Interações Recentes</h2>
+                    <p class="text-gray-600 text-4xl mt-4">23</p>
+                </div>
+            </div>
+
+            <!-- Tabela de resenhas recentes -->
+            <div class="mt-8">
+                <h2 class="text-2xl font-bold mb-4">Minhas Resenhas Recentes</h2>
+                <table class="w-full bg-white shadow-lg rounded-lg">
+                    <thead>
+                        <tr class="bg-gray-800 text-white">
+                            <th class="p-4 text-left">Título</th>
+                            <th class="p-4 text-left">Data</th>
+                            <th class="p-4 text-left">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-t">
+                            <td class="p-4">Dom Casmurro</td>
+                            <td class="p-4">10/09/2024</td>
+                            <td class="p-4">
+                                <a href="#" class="text-blue-500">Editar</a>
+                            </td>
+                        </tr>
+                        <tr class="border-t">
+                            <td class="p-4">Memórias Póstumas de Brás Cubas</td>
+                            <td class="p-4">05/09/2024</td>
+                            <td class="p-4">
+                                <a href="#" class="text-blue-500">Editar</a>
+                            </td>
+                        </tr>
+                        <tr class="border-t">
+                            <td class="p-4">O Cortiço</td>
+                            <td class="p-4">01/09/2024</td>
+                            <td class="p-4">
+                                <a href="#" class="text-blue-500">Editar</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

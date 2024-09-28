@@ -20,7 +20,7 @@ model Resenha {
   id               Int          @id @default(autoincrement())
   titulo           String
   dt_criacao       DateTime     @default(dbgenerated("CURRENT_TIMESTAMP"))
-  dt_ultima_edicao DateTime?    @default(dbgenerated("CURRENT_TIMESTAMP"))
+  dt_ultima_edicao DateTime     @default(dbgenerated("CURRENT_TIMESTAMP"))
   conteudo         String
   usuario          Usuario      @relation("UsuarioResenhas", fields: [usuarioId], references: [id])
   usuarioId        Int
