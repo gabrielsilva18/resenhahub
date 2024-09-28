@@ -13,7 +13,6 @@ router.post("/resenha", (req: Request, res: Response) => {
 
     const fileName = `${uuidv4()}.md`;
     const filePath = path.join(path.join(__dirname, '../../data/reviews'), fileName);
-    console.log(filePath);
 
     // Retorna uma resposta de sucesso
     res.status(201).json({ message: "Resenha recebida com sucesso" });

@@ -44,6 +44,10 @@ router.get("/api/resenhas-usuario", userAuth, async (req: Request, res: Response
 
         const allReviews = await getAllReviewOfUser(userId);
 
+        if (!!allReviews) {
+            return res.status(404).json({ error: 'Nenhuma resenha encontrada para o usuário.' });
+        }
+
         const formattedReviews = await formatReviews(allReviews);
         res.status(200).send(formattedReviews);
     } catch (error) {

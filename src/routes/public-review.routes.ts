@@ -27,6 +27,11 @@ router.get("/api/resenha/:id", async (req: Request, res: Response) => {
     try {
         const id = parseInt(req.params.id.trim());
         const review = await getReview(id);
+
+        if (!review) {
+            return res.status(404).json({ error: 'Essa resenha não existe.' });
+        }
+
         const formatedReview = await formatReview(review);
         res.status(200).send(formatedReview);
     } catch (error) {

@@ -32,10 +32,6 @@ const getReview = async (id: number) => {
             },
         });
 
-        if (!review) {
-            throw new Error(`Resenha com o ${id} não foi encontrada.`);
-        }
-
         return review;
     } catch (error) {
         console.error(error);
