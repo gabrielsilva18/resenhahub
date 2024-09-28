@@ -37,7 +37,7 @@ Este é um projeto de plataforma de resenhas que permite aos usuários criar e c
    - Adicione a URL de conexão do banco de dados PostgreSQL e do Token JWT:
      ```
      DATABASE_URL="postgresql://usuario:senha@localhost:5432/resenhahub"
-     JWT_SECRET_KEY=<seu-token>
+     JWT_SECRET_KEY="<seu-token>"
      ```
    - 
 4. Execute as inicializações do Prisma:
