@@ -49,7 +49,7 @@
             const content = tinymce.get('content').getContent();
             
             if (title && content) {
-                fetch('/resenha', {
+                fetch('/api/resenha', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
