@@ -12,8 +12,6 @@ function userAuth(req: Request, res: Response, next: NextFunction) {
                 console.error('Erro de verificação do token:', err);
                 return res.status(401).json({ error: 'Token inválido.' });
             }
-
-            console.log("O usuário está autenticado!")
             next();
         });
     } else {

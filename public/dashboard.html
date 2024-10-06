@@ -7,95 +7,177 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 font-sans leading-normal tracking-normal">
-
-    <!-- Sidebar -->
-    <div class="flex flex-col md:flex-row">
-        <nav class="bg-gray-800 w-full md:w-64 h-screen shadow-lg">
-            <div class="p-6">
-                <a href="#" class="text-white text-2xl font-bold">ResenhaHub</a>
-            </div>
-            <ul class="mt-6">
-                <li class="text-gray-300 hover:bg-gray-700 hover:text-white">
-                    <a href="/resenhas" class="flex items-center p-4">
-                        <span class="text-lg">📚 Minhas Resenhas</span>
-                    </a>
-                </li>
-                <li class="text-gray-300 hover:bg-gray-700 hover:text-white">
-                    <a href="/criar-resenha" class="flex items-center p-4">
-                        <span class="text-lg">✍️ Adicionar Nova Resenha</span>
-                    </a>
-                </li>
-                <li class="text-gray-300 hover:bg-gray-700 hover:text-white">
-                    <a href="#" class="flex items-center p-4">
-                        <span class="text-lg">📖 Livros Salvos</span>
-                    </a>
-                </li>
-            </ul>
+    <div class="flex flex-col h-screen">
+        <!-- Navbar for mobile -->
+        <nav class="bg-gray-800 p-4 flex justify-between items-center md:hidden">
+            <a href="#" class="text-white text-2xl font-bold">ResenhaHub</a>
+            <button id="menu-toggle" class="text-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                </svg>
+            </button>
         </nav>
 
-        <!-- Main Content -->
-        <main class="flex-1 p-6 bg-gray-100">
-            <h1 class="text-3xl font-bold mb-6">Dashboard do Usuário</h1>
+        <div class="flex flex-1 overflow-hidden">
+            <!-- Sidebar -->
+            <nav id="sidebar" class="bg-gray-800 w-64 flex-shrink-0 hidden md:flex md:flex-col">
+                <div class="p-6 flex justify-between items-center">
+                    <a href="#" class="text-white text-2xl font-bold">ResenhaHub</a>
+                </div>
+                <ul class="mt-6 flex-grow">
+                    <li class="text-gray-300 hover:bg-gray-700 hover:text-white">
+                        <a href="/minhas-resenhas" class="flex items-center p-4">
+                            <span class="text-lg">📚 Minhas Resenhas</span>
+                        </a>
+                    </li>
+                    <li class="text-gray-300 hover:bg-gray-700 hover:text-white">
+                        <a href="/criar-resenha" class="flex items-center p-4">
+                            <span class="text-lg">✍️ Adicionar Nova Resenha</span>
+                        </a>
+                    </li>
+                    <li class="text-gray-300 hover:bg-gray-700 hover:text-white">
+                        <a href="#" class="flex items-center p-4">
+                            <span class="text-lg">📖 Livros Salvos</span>
+                        </a>
+                    </li>
+                </ul>
+                <button class="text-white bg-red-600 hover:bg-red-700 px-4 py-2 rounded mt-auto m-6">
+                    <a href="/logout">Sair</a>
+                </button>
+            </nav>
 
-            <!-- Cards de estatísticas -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Card 1 -->
-                <div class="bg-white rounded-lg shadow-lg p-6">
-                    <h2 class="text-xl font-bold">Total de Resenhas</h2>
-                    <p class="text-gray-600 text-4xl mt-4">8</p>
+            <!-- Main Content -->
+            <main class="flex-1 p-6 overflow-y-auto">
+                <h1 class="text-3xl font-bold mb-6">Dashboard do Usuário</h1>
+
+                <!-- Cards de estatísticas -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <!-- Card 1 -->
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <h2 class="text-xl font-bold">Total de Resenhas</h2>
+                        <p class="text-gray-600 text-4xl mt-4" id="total-reviews">0</p>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <h2 class="text-xl font-bold">Livros Salvos</h2>
+                        <p class="text-gray-600 text-4xl mt-4">12</p>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <h2 class="text-xl font-bold">Interações Recentes</h2>
+                        <p class="text-gray-600 text-4xl mt-4">23</p>
+                    </div>
                 </div>
 
-                <!-- Card 2 -->
-                <div class="bg-white rounded-lg shadow-lg p-6">
-                    <h2 class="text-xl font-bold">Livros Salvos</h2>
-                    <p class="text-gray-600 text-4xl mt-4">12</p>
+                <!-- Resenhas Recentes -->
+                <div class="mt-8">
+                    <h2 class="text-2xl font-bold mb-4">Minhas Resenhas Recentes</h2>
+                    <div id="reviews-container" class="space-y-4"></div>
                 </div>
-
-                <!-- Card 3 -->
-                <div class="bg-white rounded-lg shadow-lg p-6">
-                    <h2 class="text-xl font-bold">Interações Recentes</h2>
-                    <p class="text-gray-600 text-4xl mt-4">23</p>
-                </div>
-            </div>
-
-            <!-- Tabela de resenhas recentes -->
-            <div class="mt-8">
-                <h2 class="text-2xl font-bold mb-4">Minhas Resenhas Recentes</h2>
-                <table class="w-full bg-white shadow-lg rounded-lg">
-                    <thead>
-                        <tr class="bg-gray-800 text-white">
-                            <th class="p-4 text-left">Título</th>
-                            <th class="p-4 text-left">Data</th>
-                            <th class="p-4 text-left">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="border-t">
-                            <td class="p-4">Dom Casmurro</td>
-                            <td class="p-4">10/09/2024</td>
-                            <td class="p-4">
-                                <a href="#" class="text-blue-500">Editar</a>
-                            </td>
-                        </tr>
-                        <tr class="border-t">
-                            <td class="p-4">Memórias Póstumas de Brás Cubas</td>
-                            <td class="p-4">05/09/2024</td>
-                            <td class="p-4">
-                                <a href="#" class="text-blue-500">Editar</a>
-                            </td>
-                        </tr>
-                        <tr class="border-t">
-                            <td class="p-4">O Cortiço</td>
-                            <td class="p-4">01/09/2024</td>
-                            <td class="p-4">
-                                <a href="#" class="text-blue-500">Editar</a>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </main>
+            </main>
+        </div>
     </div>
 
+    <script>
+        let reviews = []; // Armazena as resenhas globalmente
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadReviews();
+            setupMobileMenu();
+        });
+
+        function setupMobileMenu() {
+            const menuToggle = document.getElementById('menu-toggle');
+            const sidebar = document.getElementById('sidebar');
+
+            menuToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('hidden');
+                sidebar.classList.toggle('fixed');
+                sidebar.classList.toggle('inset-0');
+                sidebar.classList.toggle('z-50');
+            });
+        }
+
+        async function loadReviews() {
+            try {
+                const response = await fetch('/api/resenhas-usuario');
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        window.location.href = '/login';
+                        return;
+                    }
+                    throw new Error('Falha ao carregar as resenhas');
+                }
+                reviews = await response.json();
+                console.log(reviews);
+                displayReviews();
+                updateTotalReviews();
+            } catch (error) {
+                console.error('Erro:', error);
+                document.getElementById('reviews-container').innerHTML = `
+                    <p class="text-red-500">Erro ao carregar as resenhas. Por favor, tente novamente mais tarde.</p>
+                `;
+            }
+        }
+
+        function displayReviews() {
+            const container = document.getElementById('reviews-container');
+            if (reviews.length === 0) {
+                container.innerHTML = '<p class="text-gray-500">Você ainda não tem resenhas.</p>';
+                return;
+            }
+
+            const reviewsHTML = reviews.slice(0, 3).map(review => `
+                <div class="bg-white shadow rounded-lg p-6" data-review-id="${review.id}">
+                    <div class="flex flex-col md:flex-row justify-between items-start mb-4">
+                       <a href="/resenha/${review.id}"> <h2 class="text-xl font-semibold mb-2 md:mb-0">${review.titulo} <span class="text-sm text-gray-500">${review.dt_criacao}</span></h2> </a>
+                        <div class="space-y-2 md:space-y-0 md:space-x-2">
+                            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded">
+                                <a href="/editar-resenha/${review.id}">Editar</a>
+                            </button>
+                            <button onclick="deleteReview(${review.id})" class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">
+                                Deletar
+                            </button>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-4">${review.conteudo.substring(0, 500)}...</p>
+                </div>
+            `).join('');
+
+            container.innerHTML = reviewsHTML;
+        }
+
+        function updateTotalReviews() {
+            document.getElementById('total-reviews').textContent = reviews.length;
+        }
+
+        async function deleteReview(id) {
+            if (confirm('Tem certeza que deseja deletar esta resenha?')) {
+                try {
+                    const response = await fetch(`/api/resenha/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Falha ao deletar a resenha');
+                    }
+
+                    reviews = reviews.filter(review => review.id !== id);
+                    displayReviews();
+                    updateTotalReviews();
+
+                    alert('Resenha deletada com sucesso!');
+                } catch (error) {
+                    console.error('Erro ao deletar resenha:', error);
+                    alert('Erro ao deletar a resenha. Por favor, tente novamente.');
+                }
+            }
+        }
+    </script>
 </body>
 </html>

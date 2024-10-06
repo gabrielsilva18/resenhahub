@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minhas Resenhas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold mb-6">Minhas Resenhas</h1>
+        <div id="reviews-container" class="space-y-4"></div>
+    </div>
+
+    <script>
+        let reviews = []; // Armazena as resenhas globalmente
+
+        document.addEventListener('DOMContentLoaded', loadReviews);
+
+        async function loadReviews() {
+            try {
+                const response = await fetch('/api/resenhas-usuario');
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        window.location.href = '/login';
+                        return;
+                    }
+                    throw new Error('Falha ao carregar as resenhas');
+                }
+                reviews = await response.json();
+                console.log(reviews);
+                displayReviews();
+            } catch (error) {
+                console.error('Erro:', error);
+                document.getElementById('reviews-container').innerHTML = `
+                    <p class="text-red-500">Erro ao carregar as resenhas. Por favor, tente novamente mais tarde.</p>
+                `;
+            }
+        }
+
+        function displayReviews() {
+            const container = document.getElementById('reviews-container');
+            if (reviews.length === 0) {
+                container.innerHTML = '<p class="text-gray-500">Você ainda não tem resenhas.</p>';
+                return;
+            }
+
+            const reviewsHTML = reviews.map(review => `
+                <div class="bg-white shadow rounded-lg p-6" data-review-id="${review.id}">
+                    <div class="flex justify-between items-start mb-4">
+                        <a href="/resenha/${review.id}"> <h2 class="text-xl font-semibold">${review.titulo}                         <span class="text-sm text-gray-500">${review.dt_criacao}</span></h2> </a>
+                        <div>
+                            <button onclick="editReview(${review.id})" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded mr-2">
+                                <a href="/editar-resenha/${review.id}">Editar</a>
+                            </button>
+                            <button onclick="deleteReview(${review.id})" class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">
+                                Deletar
+                            </button>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-4">${review.conteudo}</p>
+                    <div class="flex justify-between items-center">
+                    </div>
+                </div>
+            `).join('');
+
+            container.innerHTML = reviewsHTML;
+        }
+
+        function editReview(id) {
+            console.log(`Editando resenha com ID: ${id}`);
+            // Implemente a lógica de edição aqui
+            // Por exemplo, abrir um modal com um formulário de edição
+        }
+
+        async function deleteReview(id) {
+            if (confirm('Tem certeza que deseja deletar esta resenha?')) {
+                try {
+                    const response = await fetch(`/api/resenha/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Falha ao deletar a resenha');
+                    }
+
+                    // Remover a resenha do array local
+                    reviews = reviews.filter(review => review.id !== id);
+                    
+                    // Atualizar a exibição
+                    displayReviews();
+
+                    alert('Resenha deletada com sucesso!');
+                } catch (error) {
+                    console.error('Erro ao deletar resenha:', error);
+                    alert('Erro ao deletar a resenha. Por favor, tente novamente.');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

@@ -101,6 +101,8 @@ const verifyTokenAsync = (token: string, secret: string): Promise<JwtPayload | s
 };
 
 
+
+
 // pega o nome de um usuário com base no id
 const getNameUser = async (id: number) => {
     const user = await prisma.usuario.findUnique({

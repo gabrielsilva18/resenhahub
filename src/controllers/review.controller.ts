@@ -1,7 +1,7 @@
 import { PrismaService } from "../services/database.service";
 import { v4 as uuidv4 } from 'uuid'; // Utilizando a função uuidv4 para gerar um nome único para cada resenha
 import { readFileSync, writeFileSync } from "fs";
-import { getNameUser } from "./user.controller";
+import { getNameUser, getIdUser } from "./user.controller";
 import path from "path";
 import dayjs from "dayjs";
 const prisma = new PrismaService();
@@ -16,9 +16,10 @@ type Review = {
 };
 
 type formattedRev = {
+    id: number,
     titulo: string,
     conteudo: string,
-    usuario: string,
+    nome_usuario: string,
     dt_criacao: string,
     dt_ultima_edicao: string
 }
@@ -31,6 +32,10 @@ const getReview = async (id: number) => {
                 id: id,
             },
         });
+
+        if (!review) {
+            throw new Error(`Resenha com o ${id} não foi encontrada.`);
+        }
 
         return review;
     } catch (error) {
@@ -117,9 +122,10 @@ const formatReview = async (review: Review) => {
         }
 
         const formatted = {
+            "id": review.id,
             "titulo": review.titulo,
             "conteudo": content,
-            "usuario": user,
+            "nome_usuario": user,
             "dt_criacao": formattedDate,
             "dt_ultima_edicao": formattedDateMod,
         };
@@ -149,4 +155,82 @@ const formatReviews = async (reviews: Review[]) => {
 }
 
 
-export { getReview, formatReview, formatReviews, createReview, getAllReviews, getAllReviewOfUser };
+// procura uma resenha especifica de um usuario
+const reviewIsOfUser = async (reviewId: number, userId: number) => {
+    const review = await prisma.resenha.findUnique({
+        where: {
+            id: reviewId,
+            usuarioId: userId
+        }
+    });
+    return review !== null;
+}
+
+const checkReviewExists = async (reviewId: number) => {
+    const review = await prisma.resenha.findUnique({
+        where: {
+            id: reviewId
+        }
+    });
+    return review !== null;
+}
+
+
+// apagando resenha
+const deleteReview = async (reviewId: number) => {
+    await prisma.$transaction(async (prisma) => {
+        // Deletar todos os comentários associados à resenha
+        await prisma.comentario.deleteMany({
+            where: {
+                resenhaId: reviewId
+            }
+        });
+
+        // Agora deletar a resenha
+        await prisma.resenha.delete({
+            where: {
+                id: reviewId
+            }
+        });
+    });
+};
+
+
+async function updateReview(id: number, data: { id: number, title: string; content: string }) {
+    try {
+        // Obtém o caminho do arquivo Markdown 
+
+        const review = await prisma.resenha.findUnique({
+            where: {
+                id: id
+            },
+
+        });
+
+        if (!review) {
+            throw new Error("Nenhuma resenha encontrada.");
+        }
+
+        const reviewPath = path.join(__dirname, '../../data/reviews', review.conteudo + ".md");
+
+        // Atualiza o conteúdo do arquivo com o novo conteúdo fornecido
+        writeFileSync(reviewPath, data.content);
+
+        // Atualiza a tabela no banco de dados
+        const updatedReview = await prisma.resenha.update({
+            where: { id },
+            data: {
+                titulo: data.title,
+            },
+        });
+
+        return updatedReview;
+    } catch (error) {
+        console.error("Erro ao atualizar a resenha:", error);
+        throw new Error("Erro ao atualizar a resenha.");
+    }
+}
+
+
+
+export { getReview, updateReview, reviewIsOfUser, checkReviewExists, deleteReview, formatReview, formatReviews, createReview, getAllReviews, getAllReviewOfUser };

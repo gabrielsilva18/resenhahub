@@ -32,9 +32,7 @@ router.post("/login", async (req: Request, res: Response) => {
 
         if (loginValidation) {
             const tokenJWT = generateToken(email);
-
             req.session.user = tokenJWT
-            console.log(tokenJWT)
             res.redirect("/dashboard")
         } else {
             res.status(401).json({ error: "Email ou senha inválidos" });
@@ -47,13 +45,27 @@ router.post("/login", async (req: Request, res: Response) => {
             })
         }
 
-        res.status(500).json({ error: "Internal server error" });
+        res.status(500).json({ error: "Erro interno no servidor." });
+
     }
 });
 
+router.get("/logout", (req: Request, res: Response) => {
+    req.session.destroy((err) => {
+        if (err) {
+            return res.status(500).send("Erro ao encerrar a sessão.");
+        }
+        res.redirect("/");
+    });
+});
+
+
 router.post("/cadastro", async (req: Request, res: Response) => {
+
     try {
         const { name, email, password } = userSchema.parse(req.body)
+        console.log("Email:", email, "Password:", password);
+
 
         const salt = genSaltSync(10);
         const hashedPassword = hashSync(password, salt);

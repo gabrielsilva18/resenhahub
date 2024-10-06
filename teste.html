@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resenhas</title>
+  <!-- Add Google Fonts link -->
+<style>
+    body {
+      font-family: 'Roboto', Arial, sans-serif;
+      margin: 20px;
+      background-color: #f0f0f0;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #333;
+      text-align: center;
+    }
+    input, button {
+      margin: 5px 0;
+      padding: 10px;
+      width: 100%;
+      box-sizing: border-box;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .resenhas {
+      margin-top: 20px;
+    }
+    .resenha {
+      border: 1px solid #ddd;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 4px;
+      background-color: #fff;
+    }
+    .resenha h3 {
+      margin: 0 0 10px 0;
+      color: #2c3e50;
+    }
+    .resenha small {
+      color: #7f8c8d;
+      font-size: 0.9em;
+      display: block;
+      margin-bottom: 10px;
+    }
+    .resenha div {
+      color: #34495e;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Gerenciador de Resenhas</h1>
+    
+    <!-- Botão para listar todas as resenhas -->
+    <button id="listarResenhas">Listar Todas as Resenhas</button>
+    
+    <!-- Campo para buscar resenha por ID -->
+    <input type="text" id="resenhaId" placeholder="Digite o ID da Resenha">
+    <button id="buscarResenha">Buscar Resenha</button>
+    
+    <!-- Div onde as resenhas serão exibidas -->
+    <div class="resenhas" id="resenhas"></div>
+  </div>
+
+  <script>
+    // Função para exibir as resenhas
+    function exibirResenhas(resenhas) {
+      const resenhasDiv = document.getElementById('resenhas');
+      resenhasDiv.innerHTML = '';  // Limpa a div antes de exibir novos dados
+      
+      if (!Array.isArray(resenhas)) {
+        resenhas = [resenhas]; // Se for uma única resenha, transforma em array
+      }
+      
+      resenhas.forEach(resenha => {
+        const resenhaElement = document.createElement('div');
+        resenhaElement.classList.add('resenha');
+        
+        // Preenche os detalhes da resenha
+        resenhaElement.innerHTML = `
+          <h3>${resenha.titulo}</h3>
+          <small>Por: ${resenha.usuario} | Criada em: ${resenha.dt_criacao}</small>
+          <div>${resenha.conteudo}</div>
+        `;
+        resenhasDiv.appendChild(resenhaElement);
+      });
+    }
+
+    // Função para listar todas as resenhas
+    document.getElementById('listarResenhas').addEventListener('click', function() {
+      fetch('http://localhost:3000/api/resenhas')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Erro na resposta da rede');
+          }
+          return response.json();
+        })
+        .then(data => {
+          exibirResenhas(data);
+        })
+        .catch(error => {
+          console.error('Erro:', error);
+          alert('Erro ao carregar as resenhas. Por favor, tente novamente.');
+        });
+    });
+
+    // Função para buscar uma resenha por ID
+    document.getElementById('buscarResenha').addEventListener('click', function() {
+      const resenhaId = document.getElementById('resenhaId').value;
+      if (resenhaId) {
+        fetch(`/api/resenha/${resenhaId}`)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Resenha não encontrada');
+            }
+            return response.json();
+          })
+          .then(resenha => {
+            exibirResenhas(resenha);
+          })
+          .catch(error => {
+            console.error('Erro:', error);
+            alert('Erro ao buscar a resenha. Verifique o ID e tente novamente.');
+          });
+      } else {
+        alert('Por favor, insira um ID válido');
+      }
+    });
+  </script>
+</body>
+</html>
