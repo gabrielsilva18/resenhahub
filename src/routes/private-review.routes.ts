@@ -93,8 +93,7 @@ router.put("/api/resenha/:id", userAuth, async (req: Request, res: Response) => 
 // deleção de resenha
 router.delete("/api/resenha/:id", userAuth, async (req: Request, res: Response) => {
     try {
-        // const userId = req.session?.user ? await getIdUser(req.session.user) : null;
-        const userId = 30;
+        const userId = req.session?.user ? await getIdUser(req.session.user) : null;
         const idReview = parseInt(req.params.id.trim());
 
         if (!userId) {
