@@ -36,6 +36,32 @@
       <!-- Adicione mais cards de resenha conforme necessário -->
     </div>
   </div>
+<script>// Função para buscar todas as resenhas da API
+  async function loadReviews() {
+    try {
+      const response = await fetch('/api/resenhas');
+      const reviews = await response.json();
+      
+      const reviewList = document.getElementById('review-list');
+      reviewList.innerHTML = ''; // Limpa a lista antes de renderizar
 
+      // Renderiza cada resenha como um card
+      reviews.forEach(review => {
+        const reviewCard = document.createElement('div');
+        reviewCard.className = 'bg-white shadow-md rounded-lg p-6';
+        reviewCard.innerHTML = `
+          <h2 class="text-xl font-bold mb-2">${review.title}</h2>
+          <p class="text-gray-600 mb-4">${review.content.substring(0, 100)}...</p>
+          <a href="/resenha/${review.id}" class="text-blue-500 hover:underline">Ler mais</a>
+        `;
+        reviewList.appendChild(reviewCard);
+      });
+    } catch (error) {
+      console.error('Erro ao carregar resenhas:', error);
+    }
+  }
+
+  // Chama a função para carregar as resenhas assim que a página for carregada
+  window.onload = loadReviews;</script>
 </body>
 </html>

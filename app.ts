@@ -2,7 +2,9 @@ import express, { Response, Request } from 'express'
 import bodyParser from 'body-parser';
 import publicReviewRoutes from './src/routes/public-review.routes'
 import userRoutes from './src/routes/user.routes'
-import commentRoutes from './src/routes/comment.routes'
+import commentRoutes from './src/routes/public-comment.routes'
+import publicCommentRoutes from './src/routes/public-comment.routes'
+import privateCommentRoutes from './src/routes/private-comment.routes'
 import privateReviewRoutes from './src/routes/private-review.routes'
 import session from 'express-session'
 
@@ -34,7 +36,7 @@ app.get("/", (req: Request, res: Response) => {
     res.sendFile(path.join(__dirname, '../public', 'index.html'));
 })
 
-app.use(publicReviewRoutes, userRoutes, commentRoutes, privateReviewRoutes)
+app.use(publicReviewRoutes, userRoutes,publicCommentRoutes, privateCommentRoutes, commentRoutes, privateReviewRoutes)
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`)

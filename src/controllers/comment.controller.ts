@@ -1,9 +1,23 @@
-import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
+import dayjs from 'dayjs';
+import { getNameUser } from './user.controller';
+import { Comentario } from '@prisma/client';
+
 
 const prisma = new PrismaClient();
 
-const listarComentarios = async (id: number) => {
+type  formattedResposta = {
+    id: number;
+    texto: string;
+    nome_usuario: string;
+    dt_criacao: string;
+    respostaAId: number | null;
+}
+
+//COMENTÁRIOS A RESENHAS
+
+//lista todos os comentarios
+export const listarComentarios = async (id: number) => {
     try {
         const comentarios = await prisma.comentario.findMany({
             where: { resenhaId: Number(id) },
@@ -22,7 +36,7 @@ const listarComentarios = async (id: number) => {
     }
 };
 
-const criarComentario = async (texto: string, usuarioId: number, resenhaId: number, respostaAId: number) => {
+export const criarComentario = async (texto: string, usuarioId: number, resenhaId: number, respostaAId: number) => {
     try {
         const novoComentario = await prisma.comentario.create({
             data:
@@ -41,7 +55,7 @@ const criarComentario = async (texto: string, usuarioId: number, resenhaId: numb
     }
 };
 
-const atualizarComentario = async (id: number, texto: string) => {
+export const atualizarComentario = async (id: number, texto: string) => {
     try {
         const comentariosExistente = await prisma.comentario.findUnique({
             where: { id: Number(id) }
@@ -62,7 +76,7 @@ const atualizarComentario = async (id: number, texto: string) => {
     }
 };
 
-const deletarComentario = async (id: number) => {
+export const deletarComentario = async (id: number) => {
     try {
         const comentario = await prisma.comentario.findUnique({
             where: { id: Number(id) },
@@ -83,7 +97,114 @@ const deletarComentario = async (id: number) => {
     }
 };
 
+//RESPOSTAS A OUTROS COMENTARIOS
+export const listarRespostas = async (comentarioId: number) => {
+    try {
+        const respostas = await prisma.comentario.findMany({
+            where: { respostaAId: comentarioId },
+            include: {
+                usuario: true, // Inclui detalhes do usuário
+            },
+        });
+        return respostas;
+    } catch (error) {
+        console.error(error);
+        throw new Error('Erro ao listar respostas.');
+    }
+};
 
+export const responderComentario = async (texto: string, usuarioId: number, resenhaId: number, respostaAId: number) => {
+    try {
+        const novaResposta = await prisma.comentario.create({
+            data: {
+                texto,
+                usuarioId,
+                resenhaId,
+                respostaAId,
+            },
+        });
+        return novaResposta;
+    } catch (error) {
+        console.error(error);
+        throw new Error('Erro ao responder ao comentário.');
+    }
+};
 
+export const atualizarRespostaComentario = async (id: number, texto: string) => {
+    try {
+        const respostaExistente = await prisma.comentario.findUnique({
+            where: { id: Number(id) }
+        });
+        if (!respostaExistente) {
+            throw new Error(`Resposta não encontrada.`);
+        }
+        const respostaAtualizada = await prisma.comentario.update({
+            where: { id: Number(id) },
+            data: { texto }
+        });
+        return respostaAtualizada;
+    } catch (error) {
+        throw new Error('Erro ao atualizar resposta ao comentário.');
+    }
+};
 
-export { listarComentarios, criarComentario, atualizarComentario, deletarComentario };
+export const deletarRespostaComentario = async (id: number) => {
+    try {
+        const resposta = await prisma.comentario.findUnique({
+            where: { id: Number(id) },
+        });
+        if (!resposta) {
+            throw new Error(`Resposta não encontrada.`);
+        }
+        await prisma.comentario.delete({
+            where: { id: Number(id) },
+        });
+        return resposta;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+//FORMATAÇÃO DAS RESPOSTAS
+
+// uma única resposta formatada
+export const formatResposta = async (resposta: Comentario): Promise<formattedResposta> => {
+    try {
+        let formattedDate = dayjs(new Date(resposta.dt_criacao)).format('DD/MM/YYYY HH:mm');
+        const user = await getNameUser(resposta.usuarioId);
+
+        if (!user) {
+            throw new Error("Usuário não encontrado");
+        }
+
+        const formatted = {
+            id: resposta.id,
+            texto: resposta.texto,
+            nome_usuario: user,
+            dt_criacao: formattedDate,
+            respostaAId: resposta.respostaAId,
+        };
+
+        return formatted;
+    } catch (error) {
+        console.error("Erro ao formatar a resposta:", error);
+        throw error;
+    }
+};
+
+// lista de respostas formatada
+export const formatRespostas = async (respostas: Comentario[]): Promise<formattedResposta[]> => {
+    const formattedRespostas: formattedResposta[] = [];
+
+    for (let resposta of respostas) {
+        try {
+            const formattedResposta = await formatResposta(resposta);
+            formattedRespostas.push(formattedResposta);
+        } catch (error) {
+            console.error(`Erro ao formatar resposta ${resposta.id}:`, error);
+        }
+    }
+
+    return formattedRespostas;
+};

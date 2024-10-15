@@ -12,8 +12,8 @@
     <header class="bg-[#FBFDFC] text-blue-600 py-4 shadow-md">
         <div class="container mx-auto px-4 flex items-center justify-between">
             <!-- Logo aumentada -->
-            <img src="./img/logo.png" alt="Logo Resenhahub" class="h-20"> <!-- Aumentei a altura para 20 -->
-            <!-- Navegação (se precisar adicionar links) -->
+            <img src="./img/logo.png" alt="Logo Resenhahub" class="h-20">
+            <!-- Navegação -->
             <nav class="flex items-center space-x-4">
                 <ul class="flex space-x-4">
                     <li><a href="#" class="text-lg font-semibold hover:text-orange-500">Início</a></li>
@@ -30,50 +30,48 @@
         </div>
     </header>
 
-    <!-- Conteúdo principal com paleta laranja e azul -->
+    <!-- Conteúdo principal -->
     <main class="container mx-auto px-4 py-8">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            <!-- Exemplo de artigo com cores ajustadas -->
-            <article class="bg-[#FBFDFC] rounded-lg shadow-md overflow-hidden">
-                <div class="p-4">
-                    <h2 class="text-xl font-semibold mb-2 text-blue-600">
-                        <a href="./resenha.html" class="hover:text-orange-500">Resenha: O Senhor dos Anéis</a>
-                    </h2>
-                    <p class="text-gray-700 mb-4">Uma jornada épica através da Terra-média que cativou gerações de leitores...</p>
-                    <p class="text-sm text-gray-500">Por João Silva | 10 de setembro, 2024</p>
-                </div>
-            </article>
-
-            <article class="bg-[#FBFDFC] rounded-lg shadow-md overflow-hidden">
-                <div class="p-4">
-                    <h2 class="text-xl font-semibold mb-2 text-blue-600">
-                        <a href="#" class="hover:text-orange-500">Resenha: 1984</a>
-                    </h2>
-                    <p class="text-gray-700 mb-4">Uma visão distópica do futuro que continua relevante nos dias de hoje...</p>
-                    <p class="text-sm text-gray-500">Por Maria Oliveira | 5 de setembro, 2024</p>
-                </div>
-            </article>
-
-            <article class="bg-[#FBFDFC] rounded-lg shadow-md overflow-hidden">
-                <div class="p-4">
-                    <h2 class="text-xl font-semibold mb-2 text-blue-600">
-                        <a href="#" class="hover:text-orange-500">Resenha: Orgulho e Preconceito</a>
-                    </h2>
-                    <p class="text-gray-700 mb-4">Um clássico da literatura que explora relações sociais e romance...</p>
-                    <p class="text-sm text-gray-500">Por Carlos Santos | 1 de setembro, 2024</p>
-                </div>
-            </article>
-
-            <article class="bg-[#FBFDFC] rounded-lg shadow-md overflow-hidden">
-                <div class="p-4">
-                    <h2 class="text-xl font-semibold mb-2 text-blue-600">
-                        <a href="#" class="hover:text-orange-500">Resenha: Cem Anos de Solidão</a>
-                    </h2>
-                    <p class="text-gray-700 mb-4">Uma obra-prima do realismo mágico que conta a história de várias gerações...</p>
-                    <p class="text-sm text-gray-500">Por Ana Rodrigues | 28 de agosto, 2024</p>
-                </div>
-            </article>
+        <div id="review-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <!-- Resenhas serão carregadas dinamicamente aqui -->
         </div>
     </main>
+
+    <script>
+        // Função para buscar todas as resenhas da API
+        async function loadReviews() {
+            try {
+                const response = await fetch('/api/resenhas'); // Faz a requisição para a API
+                const reviews = await response.json(); // Converte a resposta para JSON
+                
+                const reviewList = document.getElementById('review-list');
+                reviewList.innerHTML = ''; // Limpa o conteúdo anterior
+
+                // Itera sobre as resenhas e renderiza cada uma delas
+                reviews.forEach(review => {
+                    // Verifica se o campo 'conteudo' existe
+                    const content = review.conteudo ? review.conteudo.substring(0, 100) : 'Conteúdo não disponível';
+                    const title = review.titulo || 'Título não disponível';
+                    const author = review.usuario || 'Autor desconhecido';
+                    const date = review.dt_criacao ? new Date(review.dt_criacao).toLocaleDateString() : 'Data desconhecida';
+
+                    const reviewCard = document.createElement('div');
+                    reviewCard.className = 'bg-white shadow-md rounded-lg p-6';
+                    reviewCard.innerHTML = `
+                        <h2 class="text-xl font-bold mb-2">${title}</h2>
+                        <p class="text-gray-600 mb-4">${content}...</p>
+                        <p class="text-sm text-gray-500">Por ${author} | ${date}</p>
+                        <a href="/resenha/${review.id}" class="text-blue-500 hover:underline">Ler mais</a>
+                    `;
+                    reviewList.appendChild(reviewCard);
+                });
+            } catch (error) {
+                console.error('Erro ao carregar resenhas:', error);
+            }
+        }
+
+        // Chama a função para carregar as resenhas quando a página carregar
+        window.onload = loadReviews;
+    </script>
 </body>
 </html>
