@@ -42,7 +42,6 @@ Este é um projeto de plataforma de resenhas que permite aos usuários criar e c
    - 
 4. Execute as inicializações do Prisma:
    ```
-   npx prisma migrate dev
    npx prisma db push
    npx prisma generate
    ```
