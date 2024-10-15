@@ -34,12 +34,11 @@ Este é um projeto de plataforma de resenhas que permite aos usuários criar e c
 
 3. Configure as variáveis de ambiente:
    - Crie um arquivo `.env` na raiz do projeto
-   - Adicione a URL de conexão do banco de dados PostgreSQL e a palavra-chave do Token JWT:
+   - Adicione a URL de conexão do banco de dados PostgreSQL (onde <usuario> e <senha> são as credenciais de conexão com seu Postgres) e a palavra-chave do Token JWT:
      ```
-     DATABASE_URL="postgresql://usuario:senha@localhost:5432/resenhahub"
+     DATABASE_URL="postgresql://<usuario>:<senha>@localhost:5432/resenhahub"
      JWT_SECRET_KEY="<palavra-chave>"
      ```
-   - 
 4. Execute as inicializações do Prisma:
    ```
    npx prisma db push
