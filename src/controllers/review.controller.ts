@@ -53,7 +53,7 @@ const getAllReviewOfUser = async (id: number) => {
             },
         });
 
-        if (!review) {
+        if (review.length === 0) {
             throw new Error(`Nenhuma resenha foi encontrada.`);
         }
 
@@ -72,7 +72,12 @@ const createReview = async (titulo: string, conteudo: string, IdUsuario: number)
     const fileName = `${uuidv4()}`;
     const filePath = path.join(path.join(__dirname, '../../data/reviews'), fileName + ".md");
 
-    writeFileSync(filePath, conteudo)
+    try {
+        writeFileSync(filePath, conteudo);
+    } catch (error) {
+        console.error("Erro ao escrever o arquivo:", error);
+        throw new Error("Não foi possível criar a resenha.");
+    }
 
     try {
         await prisma.resenha.create({
@@ -221,6 +226,7 @@ async function updateReview(id: number, data: { id: number, title: string; conte
             where: { id },
             data: {
                 titulo: data.title,
+                conteudo: review.conteudo
             },
         });
 

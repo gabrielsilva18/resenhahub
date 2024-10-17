@@ -1,83 +1,119 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard do Usuário - ResenhaHub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .alert {
-            z-index: 1000;
-            width: 400px;
-            text-align: center;
-            align-items: center;
-            justify-content: center;
-            top: 50%; /* Centraliza verticalmente */
-            left: 50%; /* Centraliza horizontalmente */
-            transform: translate(-50%, -50%); /* Ajuste para a centralização perfeita */
-            position: fixed; /* Para que a mensagem fique fixa no centro */
-        }
+      .alert {
+        z-index: 1000;
+        width: 400px;
+        text-align: center;
+        align-items: center;
+        justify-content: center;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        position: fixed;
+      }
+
+      /* Ajustar tamanho dos containers das resenhas */
+      .review-container {
+        min-height: 200px;
+        margin-bottom: 24px;
+        padding: 20px;
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      /* Ajuste para o conteúdo do título e botões */
+      .review-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+      }
+
+      /* Botões de editar e excluir */
+      .review-buttons {
+        display: flex;
+        gap: 10px;
+      }
+
+      .review-buttons button {
+        padding: 8px 16px;
+        font-size: 14px;
+      }
+
+      /* Ajustar o tamanho da grid para resenhas */
+      #reviews-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 16px;
+      }
+
+      /* Adicionar quebra de linha para resenhas longas */
+      .review-content {
+        word-break: break-word;
+      }
     </style>
-</head>
-<body class="bg-gray-100 font-sans leading-normal tracking-normal">
+  </head>
+
+  <body class="bg-gray-100 font-sans leading-normal tracking-normal">
     <div class="flex flex-col h-screen">
-        <!-- Navbar for mobile -->
-        <nav class="bg-gray-800 p-4 flex justify-between items-center md:hidden">
-            <a href="#" class="text-white text-2xl font-bold">ResenhaHub</a>
-            <button id="menu-toggle" class="text-white">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
-                </svg>
-            </button>
-        </nav>
+      <!-- Navbar para mobile -->
+      <header class="bg-[#FBFDFC] text-blue-600 py-4 shadow-md">
+        <div class="container mx-auto px-4 flex items-center justify-between">
+          <!-- Logo aumentada -->
+          <img src="./img/logo.png" alt="Logo Resenhahub" class="h-20" />
 
-        <div class="flex flex-1 overflow-hidden">
-            <!-- Sidebar -->
-            <nav id="sidebar" class="bg-gray-800 w-64 flex-shrink-0 hidden md:flex md:flex-col">
-                <div class="p-6 flex justify-between items-center">
-                    <a href="#" class="text-white text-2xl font-bold">ResenhaHub</a>
-                </div>
-                <ul class="mt-6 flex-grow">
-                    <li class="text-gray-300 hover:bg-gray-700 hover:text-white">
-                        <a href="/minhas-resenhas" class="flex items-center p-4">
-                            <span class="text-lg">📚 Minhas Resenhas</span>
-                        </a>
-                    </li>
-                    <li class="text-gray-300 hover:bg-gray-700 hover:text-white">
-                        <a href="/criar-resenha" class="flex items-center p-4">
-                            <span class="text-lg">✍️ Adicionar Nova Resenha</span>
-                        </a>
-                    </li>
-                    <li class="text-gray-300 hover:bg-gray-700 hover:text-white">
-                        <a href="#" class="flex items-center p-4">
-                            <span class="text-lg">📖 Livros Salvos</span>
-                        </a>
-                    </li>
-                </ul>
-                <button class="text-white bg-red-600 hover:bg-red-700 px-4 py-2 rounded mt-auto m-6">
-                    <a href="/logout">Sair</a>
-                </button>
-            </nav>
+          <!-- Navegação -->
+          <nav class="flex items-center space-x-4">
+            <ul class="flex space-x-4 items-center">
+              <li>
+                <a href="/criar-resenha" class="flex items-center p-4 hover:text-blue-800">
+                  <span class="text-lg">✍️Nova Resenha</span>
+                </a>
+              </li>
+              <li>
+                <a href="/minhas-resenhas" class="flex items-center p-4 hover:text-blue-800">
+                  <span class="text-lg">📚 Minhas Resenhas</span>
+                </a>
+              </li>
+              <li>
+                <a href="#" id="ver-todas-resenhas" class="flex items-center p-4 hover:text-blue-800">
+                  <span class="text-lg">📚 Ver Todas Resenhas</span>
+                </a>
+              </li>
+              <li>
+                <a href="/logout" class="ml-4 bg-red-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-red-600 transition">
+                  Sair
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </header>
 
-            <!-- Main Content -->
-            <main class="flex-1 p-6 overflow-y-auto">
+        <!-- Conteúdo principal -->
+        <main class="container mx-auto px-4 py-8">
+            <div id="dashboard-content">
                 <h1 class="text-3xl font-bold mb-6">Dashboard do Usuário</h1>
 
                 <!-- Cards de estatísticas -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <!-- Card 1 -->
                     <div class="bg-white rounded-lg shadow-lg p-6">
                         <h2 class="text-xl font-bold">Total de Resenhas</h2>
                         <p class="text-gray-600 text-4xl mt-4" id="total-reviews">0</p>
                     </div>
 
-                    <!-- Card 2 -->
                     <div class="bg-white rounded-lg shadow-lg p-6">
                         <h2 class="text-xl font-bold">Livros Salvos</h2>
                         <p class="text-gray-600 text-4xl mt-4">12</p>
                     </div>
 
-                    <!-- Card 3 -->
                     <div class="bg-white rounded-lg shadow-lg p-6">
                         <h2 class="text-xl font-bold">Interações Recentes</h2>
                         <p class="text-gray-600 text-4xl mt-4">23</p>
@@ -86,154 +122,157 @@
 
                 <!-- Resenhas Recentes -->
                 <div class="mt-8">
-                    <h2 class="text-2xl font-bold mb-4">Minhas Resenhas Recentes</h2>
+                    <h2 class="text-2xl font-bold mb-4">Minhas resenhas</h2>
                     <div id="reviews-container" class="space-y-4"></div>
                 </div>
-            </main>
-        </div>
-    </div>
+            </div>
+        </main>
 
-    <script>
-        let reviews = []; // Armazena as resenhas globalmente
+        <script>
+            let reviews = [];
+            let allReviews = []
 
-        document.addEventListener('DOMContentLoaded', () => {
-            loadReviews();
-            setupMobileMenu();
-        });
-
-        function setupMobileMenu() {
-            const menuToggle = document.getElementById('menu-toggle');
-            const sidebar = document.getElementById('sidebar');
-
-            menuToggle.addEventListener('click', () => {
-                sidebar.classList.toggle('hidden');
-                sidebar.classList.toggle('fixed');
-                sidebar.classList.toggle('inset-0');
-                sidebar.classList.toggle('z-50');
+            document.addEventListener("DOMContentLoaded", () => {
+                loadUserReviews();
+                const verTodasResenhasBtn = document.getElementById("ver-todas-resenhas");
+                verTodasResenhasBtn.addEventListener("click", (event) => {
+                    event.preventDefault();
+                    displayReviews(); // Chama a função para mostrar todas as resenhas
+                });
             });
-        }
+            document.addEventListener("DOMContentLoaded", () => {
+               
+                const verTodasResenhasBtn = document.getElementById("ver-todas-resenhas");
+                verTodasResenhasBtn.addEventListener("click", (event) => {
+                    event.preventDefault();
+                    displayAllReviews(); // Chama a função para mostrar todas as resenhas
+                    loadAllReviews()
+                });
+            });
 
-        async function loadReviews() {
-            try {
-                const response = await fetch('/api/resenhas-usuario');
-                if (!response.ok) {
-                    if (response.status === 401) {
-                        window.location.href = '/login';
-                        return;
-                    }
-                    throw new Error('Falha ao carregar as resenhas');
+
+            async function loadUserReviews() {
+                try {
+                    const userResponse = await fetch("/api/resenhas-usuario");
+                    if (!userResponse.ok) throw new Error("Erro ao carregar resenhas do usuário.");
+                    
+                    /*const allResponse = await fetch("/api/resenhas");
+                    if (!allResponse.ok) throw new Error("Erro ao carregar todas as resenhas.");*/
+
+                    const userReviews = await userResponse.json();
+                    /*const allReviews = await allResponse.json();*/
+
+                    reviews = [...userReviews];
+                    
+                    displayReviews(); // Exibe resenhas do usuário logado primeiro
+                    updateTotalReviews();
+                } catch (error) {
+                    console.error("Erro:", error);
+                    document.getElementById("reviews-container").innerHTML = `
+                        <p class="text-red-500">Erro ao carregar as resenhas. Por favor, tente novamente mais tarde.</p>
+                    `;
                 }
-                reviews = await response.json();
-                console.log(reviews);
-                displayReviews();
-                updateTotalReviews();
-            } catch (error) {
-                console.error('Erro:', error);
-                document.getElementById('reviews-container').innerHTML = `
-                    <p class="text-red-500">Erro ao carregar as resenhas. Por favor, tente novamente mais tarde.</p>
+            }
+
+            async function loadAllReviews() {
+    try {
+        const allResponse = await fetch("/api/resenhas");
+        if (!allResponse.ok) throw new Error("Erro ao carregar todas as resenhas.");
+
+        const fetchedReviews = await allResponse.json(); // Mudei o nome aqui para fetchedReviews
+
+        allReviews = [...fetchedReviews]; // Atualize a variável global allReviews
+
+        displayAllReviews(); // Exibe todas as resenhas
+    } catch (error) {
+        console.error("Erro:", error);
+        document.getElementById("reviews-container").innerHTML = `
+            <p class="text-red-500">Erro ao carregar as resenhas. Por favor, tente novamente mais tarde.</p>
+        `;
+    }
+}
+
+
+            function displayReviews() {
+                const container = document.getElementById("reviews-container");
+                if (reviews.length === 0) {
+                    container.innerHTML = '<p class="text-gray-500">Você ainda não tem resenhas.</p>';
+                    return;
+                }
+
+                const reviewsHTML = reviews
+                    .slice(0, 3)
+                    .map(
+                        (review) => `
+                            <div class="bg-white shadow rounded-lg p-6" data-review-id="${review.id}">
+                                <div class="flex justify-between items-start mb-4">
+                                    <a href="/resenha/${review.id}">
+                                        <h2 class="text-xl font-semibold">${review.titulo} <span class="text-sm text-gray-500">${review.dt_criacao}</span></h2>
+                                    </a>
+                                    <div class="space-x-2">
+                                        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded">
+                                            <a href="/editar-resenha/${review.id}">Editar</a>
+                                        </button>
+                                        <button onclick="deleteReview(${review.id})" class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">
+                                            Deletar
+                                        </button>
+                                    </div>
+                                </div>
+                                <p class="text-gray-600">${review.conteudo.substring(0, 500)}...</p>
+                            </div>
+                        `
+                    )
+                    .join("");
+
+                container.innerHTML = reviewsHTML;
+            }
+
+            function displayAllReviews() {
+                const dashboardContent = document.getElementById("dashboard-content");
+                const reviewsHTML = allReviews
+                    .map(
+                        (review) => `
+                            <div class="bg-white shadow rounded-lg p-6" data-review-id="${review.id}">
+                                <div class="flex justify-between items-start mb-4">
+                                    <a href="/resenha/${review.id}">
+                                        <h2 class="text-xl font-semibold">${review.titulo} <span class="text-sm text-gray-500">${review.dt_criacao}</span></h2>
+                                    </a>
+                                </div>
+                                <p class="text-gray-600">${review.conteudo.substring(0, 500)}...</p>
+                            </div>
+                        `
+                    )
+                    .join("");
+
+                dashboardContent.innerHTML = `
+                    <h1 class="text-3xl font-bold mb-6">Todas as Resenhas</h1>
+                    <div class="space-y-4">
+                        ${reviewsHTML}
+                    </div>
                 `;
             }
-        }
 
-        function displayReviews() {
-            const container = document.getElementById('reviews-container');
-            if (reviews.length === 0) {
-                container.innerHTML = '<p class="text-gray-500">Você ainda não tem resenhas.</p>';
-                return;
+            function updateTotalReviews() {
+                const totalReviewsElement = document.getElementById("total-reviews");
+                totalReviewsElement.textContent = reviews.length;
             }
 
-            const reviewsHTML = reviews.slice(0, 3).map(review => `
-                <div class="bg-white shadow rounded-lg p-6" data-review-id="${review.id}">
-                    <div class="flex flex-col md:flex-row justify-between items-start mb-4">
-                       <a href="/resenha/${review.id}"> <h2 class="text-xl font-semibold mb-2 md:mb-0">${review.titulo} <span class="text-sm text-gray-500">${review.dt_criacao}</span></h2> </a>
-                        <div class="space-y-2 md:space-y-0 md:space-x-2">
-                            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded">
-                                <a href="/editar-resenha/${review.id}">Editar</a>
-                            </button>
-                            <button onclick="deleteReview(${review.id})" class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">
-                                Deletar
-                            </button>
-                        </div>
-                    </div>
-                    <p class="text-gray-600 mb-4">${review.conteudo.substring(0, 500)}...</p>
-                </div>
-            `).join('');
-
-            container.innerHTML = reviewsHTML;
-        }
-
-        function updateTotalReviews() {
-            document.getElementById('total-reviews').textContent = reviews.length;
-        }
-
-        async function deleteReview(id) {
-            const alertContainer = document.createElement('div');
-            alertContainer.className = 'alert';
-            alertContainer.id = 'alert-confirm';
-            alertContainer.innerHTML = `
-                <div class="bg-red-600 text-white p-4 rounded shadow-md">
-                    <p>Tem certeza que deseja deletar esta resenha?</p>
-                    <button onclick="confirmDelete(${id})" class="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 rounded">Sim</button>
-                    <button onclick="closeAlert()" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2 rounded">Não</button>
-                </div>
-            `;
-            document.body.appendChild(alertContainer);
-        }
-
-        function closeAlert() {
-            const alert = document.getElementById('alert-confirm');
-            if (alert) alert.remove();
-        }
-
-        async function confirmDelete(id) {
-            closeAlert(); // Fechar o alerta
-
-            try {
-                const response = await fetch(`/api/resenha/${id}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
-
-                if (!response.ok) {
-                    throw new Error('Falha ao deletar a resenha');
+            function deleteReview(id) {
+                if (confirm("Tem certeza que deseja deletar esta resenha?")) {
+                    fetch(`/api/resenha/${id}`, { method: "DELETE" })
+                        .then((response) => {
+                            if (!response.ok) throw new Error("Erro ao deletar resenha.");
+                            reviews = reviews.filter((review) => review.id !== id);
+                            displayReviews();
+                            updateTotalReviews();
+                        })
+                        .catch((error) => {
+                            console.error("Erro:", error);
+                            alert("Erro ao deletar a resenha. Tente novamente mais tarde.");
+                        });
                 }
-
-                // Remover a resenha da lista e atualizar a exibição
-                reviews = reviews.filter(review => review.id !== id);
-                displayReviews();
-                updateTotalReviews();
-                alertSuccess('Resenha deletada com sucesso!'); // Alerta de sucesso
-            } catch (error) {
-                console.error('Erro ao deletar a resenha:', error);
-                alertError('Erro ao deletar a resenha. Tente novamente mais tarde.'); // Alerta de erro
             }
-        }
-
-        function alertSuccess(message) {
-            alertContainer('error', message);
-        }
-
-        function alertError(message) {
-            alertContainer('error', message);
-        }
-
-        function alertContainer(type, message) {
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `alert fixed bg-${type === 'success' ? 'green' : 'red'}-500 text-white p-4 rounded shadow-md`;
-            alertDiv.style.top = '20px'; // Posição do alerta
-            alertDiv.style.left = '50%';
-            alertDiv.style.transform = 'translateX(-50%)';
-            alertDiv.innerHTML = `<p>${message}</p>`;
-
-            document.body.appendChild(alertDiv);
-
-            // Remover o alerta após 3 segundos
-            setTimeout(() => {
-                alertDiv.remove();
-            }, 3000);
-        }
-    </script>
+        </script>
+    </div>
 </body>
 </html>

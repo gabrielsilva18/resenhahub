@@ -7,7 +7,7 @@ import { getIdUser } from "../controllers/user.controller";
 const router = Router();
 
 //COMENTÁRIOS A RESENHAS
-
+// Criar um novo comentário
 // Criar um novo comentário
 router.post('/api/comentario/criar', userAuth, async (req: Request, res: Response) => {
     try {
@@ -16,15 +16,24 @@ router.post('/api/comentario/criar', userAuth, async (req: Request, res: Respons
             return res.status(401).send({ message: "Usuário não autenticado." });
         }
 
-        const { texto, resenhaId, respostaAId } = req.body;
-        const novoComentario = await criarComentario(texto, userId, resenhaId, respostaAId);
-        const comentarioFormatado = await formatResposta(novoComentario);
+        const { comment, resenhaId, respostaAId } = req.body; // Inclua respostaAId no corpo da requisição
 
+        // Verifique se o comentário não está vazio
+        if (!comment || !resenhaId) {
+            return res.status(400).send({ message: "Dados do comentário estão faltando." });
+        }
+
+        // Se respostaAId não for fornecido, use null
+        const novoComentario = await criarComentario(comment, userId, resenhaId, respostaAId || null);
+
+        const comentarioFormatado = await formatResposta(novoComentario);
         res.status(201).json(comentarioFormatado);
     } catch (error) {
+        console.error('Erro ao criar comentário:', error);
         res.status(500).send({ message: "Erro ao criar comentário." });
     }
 });
+
 
 //atualizar um comentário
 router.put('/api/comentario/atualizar/:id', userAuth, async (req: Request, res: Response) => {
