@@ -15,6 +15,26 @@ type  formattedResposta = {
 }
 
 //COMENTÁRIOS A RESENHAS
+// Busca um comentário por ID
+export const buscarComentarioPorId = async (id: number) => {
+    try {
+        const comentario = await prisma.comentario.findUnique({
+            where: { id: Number(id) }, // Busca o comentário pelo ID
+            include: {
+                usuario: true, // detalhes do usuário
+                respostas: true // respostas ao comentário
+            }
+        });
+        if (!comentario) {
+            throw new Error(`Comentário com ID ${id} não encontrado.`);
+        }
+        return comentario;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
 
 //lista todos os comentarios
 export const listarComentarios = async (id: number) => {
@@ -35,25 +55,31 @@ export const listarComentarios = async (id: number) => {
         throw error;
     }
 };
-
-export const criarComentario = async (texto: string, usuarioId: number, resenhaId: number, respostaAId: number) => {
+export const criarComentario = async (texto: string, usuarioId: number, resenhaId: string, respostaAId: number) => {
     try {
+        // Certifique-se de converter resenhaId para número
+        const resenhaIdNum = parseInt(resenhaId, 10);
+
+        if (isNaN(resenhaIdNum)) {
+            throw new Error('resenhaId deve ser um número válido');
+        }
+
         const novoComentario = await prisma.comentario.create({
-            data:
-            {
-                texto,
-                usuarioId,
-                resenhaId,
-                respostaAId,
-            },
+            data: {
+                texto: texto,
+                usuarioId: usuarioId,
+                resenhaId: resenhaIdNum, // Use o valor numérico aqui
+                respostaAId: respostaAId || null // Pode ser null ou um número
+            }
         });
 
         return novoComentario;
     } catch (error) {
-        console.log(error);
+        console.error('Erro ao criar comentário:', error);
         throw new Error('Erro ao criar comentário.');
     }
-};
+}
+
 
 export const atualizarComentario = async (id: number, texto: string) => {
     try {

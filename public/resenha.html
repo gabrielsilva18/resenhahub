@@ -13,13 +13,11 @@
         <p id="conteudo" class="text-lg text-gray-700 mb-6"></p>
     </article>
 
-    <!-- Seção de comentários -->
     <div id="comments-section" class="bg-white shadow-lg rounded-lg p-6 mt-8 border border-gray-200">
         <h3 class="text-3xl font-bold text-gray-800 mb-4">Comentários</h3>
         <div id="comments-list" class="space-y-4"></div>
     </div>
 
-    <!-- Formulário para adicionar comentários -->
     <div class="bg-white shadow-lg rounded-lg p-6 mt-8 border border-gray-200">
         <h3 class="text-3xl font-bold text-gray-800 mb-4">Deixe um comentário</h3>
         <form id="comment-form" class="space-y-4">
@@ -43,77 +41,72 @@
                 document.getElementById('data').textContent = `Por ${review.nome_usuario} | ${review.dt_criacao}`;
                 document.getElementById('conteudo').innerHTML = review.conteudo;
 
-                // Chama a função para buscar e exibir os comentários da resenha
                 fetchComments(reviewId);
-
             } catch (error) {
                 console.error('Erro ao carregar a resenha:', error);
                 document.getElementById('comments-section').innerHTML = `<p class="text-red-500">Erro ao carregar a resenha.</p>`;
             }
         }
-
-        // Função para buscar e exibir os comentários
         async function fetchComments(reviewId) {
-            try {
-                const response = await fetch(`/resenhas/${reviewId}/listar-comentarios`);
-
-                // Se a resposta não for OK (ex: 404), não vamos tratar como erro.
-                if (response.status === 404) {
-                    document.getElementById('comments-list').innerHTML = `<p class="text-gray-500">Nenhum comentário encontrado.</p>`;
-                    return; // Retorna sem gerar erro
-                }
-
-                const comentarios = await response.json();
-                console.log(comentarios); // Verifique o conteúdo da resposta
-
-                // Verifique se comentarios é um array e não está vazio
-                if (!Array.isArray(comentarios) || comentarios.length === 0) {
-                    document.getElementById('comments-list').innerHTML = `<p class="text-gray-500">Nenhum comentário encontrado.</p>`;
-                    return;
-                }
-
-                // Monta o HTML dinâmico com os comentários
-                let commentsHTML = '';
-                comentarios.forEach(comentario => {
-                    commentsHTML += `
-                        <div class="bg-gray-100 rounded-lg p-4 shadow mb-4">
-                            <p class="font-semibold text-gray-700">${comentario.nome}</p>
-                            <p class="text-gray-600">${comentario.conteudo}</p>
-                            <p class="text-sm text-gray-500 mt-2">Publicado em ${new Date(comentario.dt_criacao).toLocaleDateString()}</p>
-                        </div>
-                    `;
-                });
-
-                document.getElementById('comments-list').innerHTML = commentsHTML;
-
-            } catch (error) {
-                console.error('Erro ao carregar os comentários:', error);
-                document.getElementById('comments-section').innerHTML = `<p class="text-red-500">Erro ao carregar os comentários.</p>`;
-            }
+    try {
+        const response = await fetch(`/resenhas/${reviewId}/listar-comentarios`);
+        
+        if (!response.ok) {
+            console.error('Erro ao buscar comentários:', response.statusText);
+            document.getElementById('comments-list').innerHTML = `<p class="text-red-500">Erro ao carregar os comentários.</p>`;
+            return;
         }
 
-        // Função para adicionar um comentário
+        const comentarios = await response.json();
+        const userId = await getAuthenticatedUserId(); // Obtém o ID do usuário autenticado
+
+        let commentsHTML = '';
+        comentarios.forEach(comentario => {
+            commentsHTML += `
+                <div class="bg-gray-100 rounded-lg p-4 shadow mb-4">
+                    <p class="font-semibold text-gray-700">${comentario.nome_usuario || 'Usuário Anônimo'}</p>
+                    <p class="text-gray-600" id="comment-text-${comentario.id}">${comentario.texto || 'Conteúdo do comentário não disponível.'}</p>
+                    <p class="text-sm text-gray-500 mt-2">Publicado em ${comentario.dt_criacao || 'Data não disponível'}</p>
+            `;
+
+            // Verifica se o ID do usuário que criou o comentário corresponde ao ID do usuário autenticado
+            if (comentario.usuarioId == userId) {
+                commentsHTML += `
+                    <button onclick="editComment(${comentario.id})" class="bg-blue-500 text-white py-1 px-2 rounded hover:bg-blue-600 mt-2">Editar</button>
+                    <button onclick="deleteComment(${comentario.id})" class="bg-red-500 text-white py-1 px-2 rounded hover:bg-red-600 mt-2">Deletar</button>
+                `;
+            }
+
+            commentsHTML += `</div>`;
+        });
+
+        document.getElementById('comments-list').innerHTML = commentsHTML;
+
+    } catch (error) {
+        console.error('Erro ao carregar os comentários:', error);
+        document.getElementById('comments-section').innerHTML = `<p class="text-red-500">Erro ao carregar os comentários.</p>`;
+    }
+}
+
         document.getElementById('comment-form').addEventListener('submit', async (event) => {
             event.preventDefault();
-            const comment = document.getElementById('comment').value;
+            const texto = document.getElementById('comment').value;
 
-            // Presumindo que o nome do usuário logado está armazenado em uma variável global
-            const loggedInUserName = 'Nome do Usuário Logado'; // Altere isso para capturar o nome do usuário logado corretamente
+            const reviewId = parseInt(window.location.pathname.split("/").pop());
 
-            const reviewId = window.location.pathname.split("/").pop();
             try {
                 const response = await fetch('/api/comentario/criar', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ nome: loggedInUserName, conteudo: comment, resenhaId: reviewId })
+                    body: JSON.stringify({ texto, resenhaId: reviewId, respostaAId: null })
                 });
 
                 if (response.ok) {
                     const novoComentario = await response.json();
                     fetchComments(reviewId); // Atualiza a lista de comentários
-                    document.getElementById('comment').value = ''; // Limpa o campo de comentário após envio
+                    document.getElementById('comment').value = '';
                 } else {
                     alert('Erro ao criar comentário.');
                 }
@@ -123,7 +116,78 @@
             }
         });
 
-        // Chama a função para carregar a resenha assim que a página carrega
+        async function editComment(id) {
+            const commentTextElement = document.getElementById(`comment-text-${id}`);
+            const currentText = commentTextElement.textContent;
+            const newText = prompt("Editar comentário:", currentText);
+
+            if (newText && newText !== currentText) {
+                try {
+                    const response = await fetch(`/api/comentario/atualizar-resposta/${id}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ texto: newText })
+                    });
+
+                    if (response.ok) {
+                        fetchComments(parseInt(window.location.pathname.split("/").pop())); // Atualiza a lista de comentários
+                    } else {
+                        alert('Erro ao atualizar comentário.');
+                    }
+                } catch (error) {
+                    console.error('Erro ao atualizar o comentário:', error);
+                    alert('Erro ao atualizar o comentário.');
+                }
+            }
+        }
+
+        async function deleteComment(id) {
+            if (confirm("Você tem certeza que deseja deletar este comentário?")) {
+                try {
+                    const response = await fetch(`/api/comentario/deletar/${id}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (response.ok) {
+                        fetchComments(parseInt(window.location.pathname.split("/").pop())); // Atualiza a lista de comentários
+                    } else {
+                        alert('Erro ao deletar comentário.');
+                    }
+                } catch (error) {
+                    console.error('Erro ao deletar o comentário:', error);
+                    alert('Erro ao deletar o comentário.');
+                }
+            }
+        }
+        
+        async function getAuthenticatedUserId() {
+    const token = localStorage.getItem('jwtToken'); // Supondo que você armazena o token no localStorage
+    try {
+        const response = await fetch('/api/getUserId', { // Verifique se o endpoint está correto
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`, // Inclui o token no cabeçalho
+            },
+            body: JSON.stringify({ token })
+        });
+
+        if (response.ok) {
+            const { userId } = await response.json();
+            return userId; // Retorna o ID do usuário
+        } else {
+            const errorMessage = await response.text();
+            console.error('Erro ao obter o ID do usuário:', response.statusText, errorMessage);
+        }
+    } catch (error) {
+        console.error('Erro ao fazer a requisição:', error);
+    }
+    return null; // Retorna null em caso de erro
+}
+
+
         window.onload = fetchReview;
     </script>
 </body>

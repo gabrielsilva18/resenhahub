@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import { checkLogin, checkHasUser, generateToken, createUser } from "../controllers/user.controller";
+import { checkLogin, checkHasUser, generateToken, createUser, getIdUser } from "../controllers/user.controller";
 import { genSaltSync, hashSync } from 'bcrypt';
 import { userAuth } from '../middlewere/user-auth.middlewere'
 import { z, ZodError } from 'zod'
@@ -83,6 +83,21 @@ router.post("/cadastro", async (req: Request, res: Response) => {
             return res.status(400).json({ error: "Dados de entrada inválidos" });
         }
         return res.status(500).json({ error: "Ocorreu um erro interno do servidor." });
+    }
+});
+
+router.post('/api/getUserId', async (req, res) => {
+    const { token } = req.body; // Obtém o token do corpo da requisição
+    try {
+        const userId = await getIdUser(token);
+        if (userId) {
+            return res.json({ userId });
+        } else {
+            return res.status(404).send('Usuário não encontrado'); // Retorna erro 404 se o ID não foi encontrado
+        }
+    } catch (error) {
+        console.error('Erro ao obter o ID do usuário:', error);
+        res.status(500).send('Erro ao obter o ID do usuário');
     }
 });
 
